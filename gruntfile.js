@@ -1,9 +1,10 @@
 /**
  * Created by austin on 9/23/14.
  */
-var fs = require('fs');
-var path = require('path');
-var jsHintConfig = path.resolve(__dirname, '.jshintrc');
+var fs = require('fs')
+  , path = require('path')
+  , jsHintConfig = path.resolve(__dirname, '.jshintrc');
+
 jsHintConfig = fs.readFileSync(jsHintConfig, 'utf8');
 jsHintConfig = JSON.parse(jsHintConfig);
 

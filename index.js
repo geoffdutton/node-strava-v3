@@ -2,9 +2,8 @@
  * Created by austin on 9/18/14.
  */
 
-var fs = require('fs')
-    , HttpClient = require('./lib/httpClient')
-    , oauth = require('./lib/oauth')
+var HttpClient = require('./lib/httpClient')
+    , Oauth = require('./lib/oauth')
     , authenticator = require('./lib/authenticator')
 
     , Athlete = require('./lib/athlete')
@@ -44,7 +43,7 @@ strava.client = function (token,request) {
 
   this.request = this.request.defaults({
     'Authorization' : 'Bearer '+this.access_token
-  })
+  });
 
   var httpClient = new HttpClient(this.request);
 
@@ -60,13 +59,13 @@ strava.client = function (token,request) {
   this.rateLimiting = rateLimiting;
   this.runningRaces = new RunningRaces(httpClient);
   this.routes = new Routes(httpClient);
-}
+};
 
 // XXX Not working currently because getToken() will get
 // called and set the httpClient, making it too late for this to take effect
 // strava.config = authenticator.fetchConfig;
 
-strava.oauth = oauth;
+strava.oauth = new Oauth();
 
 // The original behavior was to use global configuration.
 strava.defaultHttpClient = new HttpClient(strava.defaultRequest.defaults({

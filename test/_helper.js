@@ -17,17 +17,18 @@ testsHelper.getSampleAthlete = function(done) {
 testsHelper.getSampleActivity = function(done) {
     strava.athlete.listActivities({include_all_efforts:true},function(err,payload) {
         if (err)
-          return done(err)
+          return done(err);
 
         if (!payload.length)
-          return done(new Error("Must have at least one activity posted to Strava to test with."));
+          return done(new Error('Must have at least one activity posted to Strava to test with.'));
 
-        // If we find an activity with an achievement, there's a better chance that it contains a segment.
+        // If we find an activity with an achievement, there's a better
+        // chance that it contains a segment.
         // This is necessary for getSampleSegment, which uses this function.
-        var withSegment = _.filter(payload, function(a) { return a.achievement_count > 1 })[0];
+        var withSegment = _.filter(payload, function(a) { return a.achievement_count > 1; })[0];
 
         if (!withSegment)
-          return done(new Error("Must have at least one activity posted to Strava with a segment effort to test with."));
+          return done(new Error('Must have at least one activity posted to Strava with a segment effort to test with.'));
 
         return strava.activities.get({id:withSegment.id,include_all_efforts:true},done)
     });
@@ -39,7 +40,7 @@ testsHelper.getSampleClub = function(done) {
           return done(err)
 
         if (!payload.length)
-          return done(new Error("Must have joined at least one club on Strava to test with."));
+          return done(new Error('Must have joined at least one club on Strava to test with.'));
 
         done(err,payload[0]);
     });
@@ -48,10 +49,10 @@ testsHelper.getSampleClub = function(done) {
 testsHelper.getSampleRoute = function(done) {
     strava.athlete.listRoutes({},function(err,payload) {
         if (err)
-          return done(err)
+          return done(err);
 
         if (!payload.length)
-          return done(new Error("Must have created at least one route on Strava to test with."));
+          return done(new Error('Must have created at least one route on Strava to test with.'));
 
         done(err,payload[0]);
     });
@@ -60,7 +61,7 @@ testsHelper.getSampleRoute = function(done) {
 testsHelper.getSampleGear = function(done) {
     this.getSampleAthlete(function(err,payload) {
         if (err)
-          return done(err)
+          return done(err);
 
         var gear;
 
@@ -71,7 +72,7 @@ testsHelper.getSampleGear = function(done) {
           gear = payload.shoes[0];
         }
         else {
-          return done(new Error("Must post at least one bike or shoes to Strava to test with"))
+          return done(new Error('Must post at least one bike or shoes to Strava to test with'))
         }
 
 
@@ -86,7 +87,7 @@ testsHelper.getSampleSegmentEffort = function(done) {
           return done(err);
 
         if (!payload.segment_efforts.length)
-          return done(new Error("Must have at least one segment effort posted to Strava to test with."));
+          return done(new Error('Must have at least one segment effort posted to Strava to test with.'));
 
         done(err,payload.segment_efforts[0]);
     });

@@ -1,12 +1,17 @@
-var should = require("should")
+var should = require('should')
     , errors = require('request-promise/errors')
-    , strava = require("../")
-    , file = require('fs').readFileSync('data/strava_config', 'utf8')
-    , config = JSON.parse(file)
-    , token = config.access_token;
+    , strava = require('../')
+    , fs = require('fs')
+    , config = {};
+
+try {
+    config = JSON.parse(fs.readFileSync('data/strava_config', 'utf8'));
+} catch (_) {}
+
+var token = config.access_token || 'test-token';
 
 
-// Test the "client" API that is based on providing an explicit per-instance access_token
+// Test the 'client' API that is based on providing an explicit per-instance access_token
 // Rather than the original global-singleton configuration design.
 
 var client = new strava.client(token);
@@ -21,7 +26,7 @@ describe('client_test', function(){
             badClient.athlete.get({})
                 .catch(errors.StatusCodeError, function (e) {
                   done();
-                })
+                });
         });
 
         it('Callback interface should return StatusCodeError for non-2xx response', function(done) {

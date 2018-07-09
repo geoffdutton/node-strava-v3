@@ -2,28 +2,34 @@
  * Created by austin on 9/20/14.
  */
 
-var should = require("should")
+var should = require('should')
     , sinon = require('sinon')
-    , strava = require("../")
-    , testHelper = require("./_helper")
+    , strava = require('../')
+    , testHelper = require('./_helper')
     , authenticator = require('../lib/authenticator');
 
 var testActivity = {}
-    , _sampleActivityPreEdit
-    , _sampleActivity;
+    , _sampleActivity
+    , requestStub
+    , sandbox;
 
 describe('activities_test', function() {
-
-    before(function(done) {
-
-        testHelper.getSampleActivity(function(err,sampleActivity) {
-            if (err)
-              return done(err)
-
-            _sampleActivity = sampleActivity;
-            _sampleActivityPreEdit = sampleActivity;
-            done();
+    beforeEach(function () {
+        sandbox = sinon.createSandbox();
+        _sampleActivity = {
+            id: 12345,
+            resource_state: 3
+        };
+        requestStub = sandbox.stub(strava.activities.client, '_requestHelper').callsFake(function (opts, done) {
+            if (done) {
+                done(null, _sampleActivity);
+            }
+            return Promise.resolve(_sampleActivity);
         });
+    });
+
+    afterEach(function () {
+        sandbox.restore();
     });
 
     describe('#create()', function () {
@@ -31,17 +37,16 @@ describe('activities_test', function() {
         it('should create an activity', function(done) {
 
             var args = {
-                name:"Most Epic Ride EVER!!!"
+                name:'Most Epic Ride EVER!!!'
                 , elapsed_time:18373
                 , distance: 1557840
-                , start_date_local: "2013-10-23T10:02:13Z"
-                , type: "Ride"
+                , start_date_local: '2013-10-23T10:02:13Z'
+                , type: 'Ride'
             };
 
             strava.activities.create(args, function (err, payload) {
 
                 if (!err) {
-                    //console.log(payload);
                     testActivity = payload;
                     (payload.resource_state).should.be.exactly(3);
                 }
@@ -81,9 +86,7 @@ describe('activities_test', function() {
 
         it('should work with a specified access token', function(done) {
             var token = testHelper.getAccessToken();
-            var tokenStub = sinon.stub(authenticator, 'getToken', function () {
-                return undefined;
-            });
+            var tokenStub = sinon.stub(authenticator, 'getToken');
 
             strava.activities.get({
               id: testActivity.id,
@@ -100,11 +103,13 @@ describe('activities_test', function() {
 
         it('should update an activity', function(done) {
 
-            var name = "Run like the wind!!"
+            var name = 'Run like the wind!!'
                 , args = {
                     id:testActivity.id
                     , name:name
                 };
+
+            _sampleActivity.name = name;
 
             strava.activities.update(args, function (err, payload) {
 
@@ -125,12 +130,12 @@ describe('activities_test', function() {
     describe('#listZones()', function () {
 
         it('should list heart rate and power zones relating to activity', function(done) {
-
+            _sampleActivity = [_sampleActivity];
             strava.activities.listZones({id:testActivity.id}, function (err, payload) {
 
                 if (!err) {
-                    //console.log(payload);
-                    //payload.should.be.instanceof(Array);
+                    // console.log(payload);
+                    payload.should.be.instanceof(Array);
                 }
                 else {
                     console.log(err);
@@ -144,6 +149,7 @@ describe('activities_test', function() {
     describe('#listLaps()', function () {
 
         it('should list laps relating to activity', function(done) {
+            _sampleActivity = [_sampleActivity];
 
             strava.activities.listLaps({id:testActivity.id}, function (err, payload) {
 
@@ -161,9 +167,8 @@ describe('activities_test', function() {
     });
 
     describe('#listComments()', function () {
-
         it('should list comments relating to activity', function(done) {
-
+            _sampleActivity = [_sampleActivity];
             strava.activities.listComments({id:testActivity.id}, function (err, payload) {
 
                 if (!err) {
@@ -180,9 +185,8 @@ describe('activities_test', function() {
     });
 
     describe('#listKudos()', function () {
-
         it('should list kudos relating to activity', function(done) {
-
+            _sampleActivity = [_sampleActivity];
             strava.activities.listKudos({id:testActivity.id}, function (err, payload) {
 
                 if (!err) {
@@ -218,12 +222,11 @@ describe('activities_test', function() {
         });
     });
 
-    //TODO ideally we'd test for some real related activities but since we created a
+    // TODO ideally we'd test for some real related activities but since we created a
     // fake activity without location data, there are no related activities.
     describe('#listRelated()', function () {
-
         it('should list activities related to activity', function(done) {
-
+            _sampleActivity = [_sampleActivity];
             strava.activities.listRelated({id:testActivity.id}, function (err, payload) {
 
                 if (!err) {
@@ -261,7 +264,7 @@ describe('activities_test', function() {
     describe('#listFriends()', function () {
 
         it('should list activities of friends associated to current athlete', function(done) {
-
+            _sampleActivity = [_sampleActivity];
             strava.activities.listFriends({}, function (err, payload) {
 
                 if (!err) {

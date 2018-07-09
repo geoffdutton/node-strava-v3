@@ -4,7 +4,8 @@
   "description": "Simple wrapper for strava v3 api",
   "main": "index.js",
   "scripts": {
-    "test": "grunt jshint simplemocha"
+    "test": "NODE_ENV=test grunt jshint simplemocha",
+    "tdd": "NODE_ENV=test mocha test/ --watch"
   },
   "repository": {
     "type": "git",
